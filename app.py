@@ -22,7 +22,7 @@ app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 jwt = JWTManager(app)
 
 @jwt.user_claims_loader
-def add_claims_to_jwt(identiy):
+def add_claims_to_jwt(identity):
     if identity == os.environ.get('ADMIN_IDENTITY'):
         return {'admin': True}
     return {'admin': False}
