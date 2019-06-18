@@ -52,5 +52,5 @@ class Ingredient(Resource):
 class IngredientList(Resource):
     @fresh_jwt_required
     def get(self):
-        ingredients = [x.json() for x in IngrdientModel.find_all()]
+        ingredients = [x.json() for x in IngredientModel.find_all()]
         return {'ingredients': ingredients}, 200
