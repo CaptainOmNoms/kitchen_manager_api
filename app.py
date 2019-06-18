@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 
+import os
 from db import db
 from blacklist import BLACKLIST
 from resources.user import User, UserLogin, UserLogout, TokenRefresh
@@ -10,12 +11,12 @@ from resources.recipe import Recipe, RecipeList
 from resources.recipe_ingredient import RecipeIngredient, RecipeIngredientList
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL'), 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
 api.Api(app)
 
-app.config['JWT_SECRET_KEY'] = 'joe'
+app.config['JWT_SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['JWT_BLACKLIST_ENABLED'] = True
 app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 jwt = JWTManager(app)
