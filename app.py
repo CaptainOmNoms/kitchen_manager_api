@@ -4,7 +4,7 @@ from flask_jwt_extended import JWTManager
 
 from db import db
 from blacklist import BLACKLIST
-from resources.user import User, UserLogin, UserLogout, TokenRefresh
+from resources.user import UserLogin, UserLogout, TokenRefresh
 from resources.ingredient import Ingredient, IngredientList
 from resources.recipe import Recipe, RecipeList
 from resources.recipe_ingredient import RecipeIngredient, RecipeIngredientList
@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
-api.Api(app)
+api = Api(app)
 
 app.config['JWT_SECRET_KEY'] = 'joe'
 app.config['JWT_BLACKLIST_ENABLED'] = True
@@ -69,17 +69,16 @@ def revoked_token_callback():
 @app.before_first_request
 def create_tables():
     db.create_all()
-    
-    
-api.add_resource('Recipe', '/recipe/<int:recipe_id>')
-api.add_resource('RecipeList', '/recipes')
-api.add_resource('Ingredient', '/ingredient/<int:ingredient_id>')
-api.add_resource('IngredientList', '/ingredients/')
-api.add_resource('RecipeIngredient', '/recipe_ingredient')
-api.add_resource('RecipeIngredientList', '/recipe_ingredients')
+
+api.add_resource(Recipe, '/recipe/<int:recipe_id>')
+api.add_resource(RecipeList, '/recipes')
+api.add_resource(Ingredient, '/ingredient/<int:ingredient_id>')
+api.add_resource(IngredientList, '/ingredients/')
+api.add_resource(RecipeIngredient, '/recipe_ingredient')
+api.add_resource(RecipeIngredientList, '/recipe_ingredients')
 #api.add_resource('User', '/user/<int:user_id>')
-api.add_resource('UserLogin', '/login')
-api.add_resource('UserLogout', '/logout')
+api.add_resource(UserLogin, '/login')
+api.add_resource(UserLogout, '/logout')
 
 if __name__ == '__main__':
     db.init_app(app)
