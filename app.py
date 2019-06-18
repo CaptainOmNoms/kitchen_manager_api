@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager
 import os
 from db import db
 from blacklist import BLACKLIST
-from resources.user import UserLogin, UserLogout, TokenRefresh
+from resources.user import User, UserRegister, UserLogin, UserLogout, TokenRefresh
 from resources.ingredient import Ingredient, IngredientList
 from resources.recipe import Recipe, RecipeList
 from resources.recipe_ingredient import RecipeIngredient, RecipeIngredientList
@@ -77,7 +77,8 @@ api.add_resource(Ingredient, '/ingredient/<int:ingredient_id>')
 api.add_resource(IngredientList, '/ingredients/')
 api.add_resource(RecipeIngredient, '/recipe_ingredient')
 api.add_resource(RecipeIngredientList, '/recipe_ingredients')
-#api.add_resource('User', '/user/<int:user_id>')
+api.add_resource(User, '/user/<int:user_id>')
+api.add_resource(UserRegister, '/register')
 api.add_resource(UserLogin, '/login')
 api.add_resource(UserLogout, '/logout')
 
