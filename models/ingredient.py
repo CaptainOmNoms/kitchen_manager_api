@@ -16,6 +16,7 @@ class IngredientModel(db.Model):
         return {
             'id': self.ingredient_id,
             'name': self.name,
+            'measurement': self.measurement
         }
 
     @classmethod
