@@ -61,7 +61,7 @@ class UserLogin(Resource):
         user = UserModel.find_by_username(data['username'])
 
         if user and safe_str_cmp(user.password, data['password']):
-            access_token = create_access_token(identity=user.id, fresh=True) 
+            access_token = create_access_token(identity=user.user_id, fresh=True) 
             refresh_token = create_refresh_token(user.user_id)
             return {
                 'access_token': access_token,
