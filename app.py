@@ -71,9 +71,9 @@ def revoked_token_callback():
 def create_tables():
     db.create_all()
 
-api.add_resource(Recipe, '/recipe/<int:recipe_id>')
+api.add_resource(Recipe, '/recipe/')
 api.add_resource(RecipeList, '/recipes')
-api.add_resource(Ingredient, '/ingredient/<int:ingredient_id>')
+api.add_resource(Ingredient, '/ingredient/')
 api.add_resource(IngredientList, '/ingredients/')
 api.add_resource(RecipeIngredient, '/recipe_ingredient')
 api.add_resource(RecipeIngredientList, '/recipe_ingredients')

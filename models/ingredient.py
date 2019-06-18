@@ -6,10 +6,11 @@ class IngredientModel(db.Model):
 
     ingredient_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(25))
+    measurement = db.Column(db.String(10))
 
-    def __init__(self, name):
+    def __init__(self, name, measurement):
         self.name = name
-        self.price = price
+        self.measurement = measurement
 
     def json(self):
         return {
