@@ -24,7 +24,7 @@ class Ingredient(Resource):
 
     @fresh_jwt_required
     def post(self):
-        data = self.parser.parser_args()
+        data = self.parser.parse_args()
 
         if IngredientModel.find_by_name_measurement(data['name'], data['measurement']):
             return {'message': 'An ingredient with that name and measurement type already exists'}
