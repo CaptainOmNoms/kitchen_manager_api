@@ -19,8 +19,8 @@ class IngredientModel(db.Model):
         }
 
     @classmethod
-    def find_by_name(cls, name):
-        return cls.query.filter_by(name=name).first()
+    def find_by_name_measurement(cls, name, measurement):
+        return cls.query.filter_by(name=name).filter_by(measurement=measurement).first()
 
     @classmethod
     def find_by_id(cls, _id):
