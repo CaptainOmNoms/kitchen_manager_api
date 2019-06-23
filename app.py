@@ -26,7 +26,7 @@ jwt = JWTManager(app)
 
 @jwt.user_claims_loader
 def add_claims_to_jwt(identity):
-    if identity == os.environ.get('ADMIN_IDENTITY'):
+    if identity == 1:  # eventually this needs to be changed to be controlled by a enviornment variable or a db lookup
         return {'admin': True}
     return {'admin': False}
 
