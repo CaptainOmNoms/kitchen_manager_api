@@ -1,24 +1,26 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import fresh_jwt_required
+from flask_jwt_extended import get_jwt_claims, get_jwt_identity,  fresh_jwt_required
 from models.ingredient import IngredientModel
+from models.recipe import RecipeModel
 from models.recipe_ingredient import RecipeIngredientModel
 
 
 class RecipeIngredient(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('amount', type=float, required=True, help="This field cannot be left blank!")
-    parser.add_argument('recipe_id', type=int, required=True, help="Need a recipe for which this ingredient belongs to!")
-    parser.add_argument('ingredient_id', type=int, required=True, help="Need an ingredient to add to a recipe!")
+    parser.add_argument('amount', type=float, required=True,
+                        help="This field cannot be left blank!")
 
     @fresh_jwt_required
-    def post(self):
+    def post(self, recipe_id, ingredient_id):
         data = RecipeIngredient.parser.parse_args()
-        if IngredientModel.find_by_id(data['ingredient_id']):
+        if not IngredientModel.find_by_id(ingredient_id):
             return {'message': "That ingredient does not exist"}, 404
-        if RecipeModel.find_by_id(['recipe_id']):
+        if not RecipeModel.find_by_id(recipe_id):
             return {'message': "That recipe does not exist"}, 404
-
-        ri = RecipeIngredientModel(**data)
+        if RecipeIngredientModel.find_by_recipe_ingredient(recipe_id, ingredient_id):
+            return {'message': "That recipe already contains that ingredient."}
+        ri = RecipeIngredientModel(data['amount'], recipe_id, ingredient_id)
+        print(ri.json())
 
         try:
             ri.save_to_db()
@@ -27,8 +29,9 @@ class RecipeIngredient(Resource):
         return ri.json(), 201
 
     @fresh_jwt_required
-    def delte(self, recipe_id, ingredient_id):
-        ri = RecipeIngredientModel.find_by_recipe_ingredient(recipe_id, ingredient_id)
+    def delete(self, recipe_id, ingredient_id):
+        ri = RecipeIngredientModel.find_by_recipe_ingredient(
+            recipe_id, ingredient_id)
 
         if ri:
             ri.delete_from_db()
@@ -36,21 +39,23 @@ class RecipeIngredient(Resource):
         return {'message': 'Recipe ingredient not found'}, 404
 
     @fresh_jwt_required
-    def put(self, amount, recipe_id, ingredient_id):
+    def put(self, recipe_id, ingredient_id):
         data = RecipeIngredient.parser.parse_args()
 
-        ri = RecipeIngredientModel.find_by_recipe_ingredient(recipe_id, ingredient_id)
+        ri = RecipeIngredientModel.find_by_recipe_ingredient(
+            recipe_id, ingredient_id)
         if ri:
             ri.amount = data['amount']
         else:
-            ri = RecipeIngredientModel(**data)
+            ri = RecipeIngredientModel(
+                data['amount'], recipe_id, ingredient_id)
 
         ri.save_to_db()
-        return ri.json()
+        return ri.json(), 201
 
 
 class RecipeIngredientList(Resource):
-    
+
     @fresh_jwt_required
     def get(self, recipe_id):
-        return {'ingredients': [x.json() for x in self.find_by_recipe(recipe_id)]}
+        return {'ingredients': [x.json() for x in RecipeIngredientModel.find_by_recipe(recipe_id)]}

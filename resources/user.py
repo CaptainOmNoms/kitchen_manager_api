@@ -4,6 +4,8 @@ from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
     jwt_refresh_token_required,
+    fresh_jwt_required,
+    get_jwt_claims,
     get_jwt_identity,
     jwt_required,
     get_raw_jwt
@@ -22,18 +24,26 @@ _user_parser.add_argument('password',
                           required=True,
                           help="This field cannot be blank."
                           )
-                          
+
 
 class User(Resource):
-    @classmethod
-    def get(cls, user_id: int):
+    @fresh_jwt_required
+    def get(self, user_id: int):
+        claims = get_jwt_claims()
+        if not claims['admin']:
+            return {'message': 'Admin privilege required.'}, 401
+
         user = UserModel.find_by_id(user_id)
         if not user:
             return {'message': 'User Not Found'}, 404
         return user.json(), 200
 
-    @classmethod
-    def delete(cls, user_id: int):
+    @fresh_jwt_required
+    def delete(self, user_id: int):
+        claims = get_jwt_claims()
+        if not claims['admin']:
+            return {'message': 'Admin privilege required.'}, 401
+
         user = UserModel.find_by_id(user_id)
         if not user:
             return {'message': 'User Not Found'}, 404
@@ -42,7 +52,12 @@ class User(Resource):
 
 
 class UserRegister(Resource):
+    @fresh_jwt_required
     def post(self):
+        claims = get_jwt_claims()
+        if not claims['admin']:
+            return {'message': 'Admin privilege required.'}, 401
+
         data = _user_parser.parse_args()
 
         if UserModel.find_by_username(data['username']):
@@ -61,7 +76,8 @@ class UserLogin(Resource):
         user = UserModel.find_by_username(data['username'])
 
         if user and safe_str_cmp(user.password, data['password']):
-            access_token = create_access_token(identity=user.user_id, fresh=True) 
+            access_token = create_access_token(
+                identity=user.user_id, fresh=True)
             refresh_token = create_refresh_token(user.user_id)
             return {
                 'access_token': access_token,
@@ -69,19 +85,19 @@ class UserLogin(Resource):
             }, 200
 
         return {"message": "Invalid Credentials!"}, 401
-        
+
+
 class UserLogout(Resource):
     @jwt_required
     def post(self):
         jti = get_raw_jwt()['jti']
         BLACKLIST.add(jti)
         return {"message": "Successfully logged out"}, 200
-    
-        
+
+
 class TokenRefresh(Resource):
     @jwt_refresh_token_required
     def post(self):
         current_user = get_jwt_identity()
         new_token = create_access_token(identity=current_user, fresh=False)
         return {'access_token': new_token}, 200
-    

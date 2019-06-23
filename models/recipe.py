@@ -1,13 +1,14 @@
 from db import db
 
+
 class RecipeModel(db.Model):
     __tablename__ = 'recipes'
 
     recipe_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80))
     recipe_type = db.Column(db.String(15))
-    description = db.Column(db.Text)
-    steps = db.Column(db.Text)
+    description = db.Column(db.String(150))
+    steps = db.Column(db.String(500))
     servings = db.Column(db.Integer)
     prep_min = db.Column(db.Integer)
     cook_min = db.Column(db.Integer)
@@ -25,12 +26,12 @@ class RecipeModel(db.Model):
         return {
             'id': self.recipe_id,
             'name': self.name,
-            'type': self.type,
+            'recipe_type': self.recipe_type,
             'description': self.description,
             'servings': self.servings,
             'prep_min': self.prep_min,
             'cook_min': self.cook_min,
-            'steps': [x.ingredient.json() for x in self.ingredients.all()]
+            'steps': self.steps
         }
 
     @classmethod
@@ -39,7 +40,11 @@ class RecipeModel(db.Model):
 
     @classmethod
     def find_by_id(cls, _id):
-        return cls.query.filter_by(id=_id).first()
+        return cls.query.filter_by(recipe_id=_id).first()
+
+    @classmethod
+    def find_all(cls):
+        return cls.query.all()
 
     def save_to_db(self):
         db.session.add(self)
