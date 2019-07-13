@@ -1,5 +1,4 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import get_jwt_claims, get_jwt_identity,  fresh_jwt_required
 from models.ingredient import IngredientModel
 
 
@@ -16,7 +15,7 @@ class NewIngredient(Resource):
                         help="Every igredient needs a measurement type."
                         )
 
-    @fresh_jwt_required
+    
     def post(self):
         data = self.parser.parse_args()
 
@@ -33,19 +32,13 @@ class NewIngredient(Resource):
 
 
 class Ingredient(Resource):
-    @fresh_jwt_required
     def get(self, ingredient_id):
         ingredient = IngredientModel.find_by_id(ingredient_id)
         if ingredient:
             return ingredient.json()
         return {'message': 'Ingredient not found '}
 
-    @fresh_jwt_required
     def delete(self, ingredient_id):
-        claims = get_jwt_claims()
-        if not claims['admin']:
-            return{'message': 'Admin privilege required.'}, 401
-
         ingredient = IngredientModel.find_by_id(ingredient_id)
 
         if ingredient:
@@ -55,7 +48,6 @@ class Ingredient(Resource):
 
 
 class IngredientList(Resource):
-    @fresh_jwt_required
     def get(self):
         ingredients = [x.json() for x in IngredientModel.find_all()]
         return {'ingredients': ingredients}, 200

@@ -10,7 +10,6 @@ class RecipeIngredient(Resource):
     parser.add_argument('amount', type=float, required=True,
                         help="This field cannot be left blank!")
 
-    @fresh_jwt_required
     def post(self, recipe_id, ingredient_id):
         data = RecipeIngredient.parser.parse_args()
         if not IngredientModel.find_by_id(ingredient_id):
@@ -28,7 +27,6 @@ class RecipeIngredient(Resource):
             return {"message": "An error occurred inserting the recipe ingredient."}, 500
         return ri.json(), 201
 
-    @fresh_jwt_required
     def delete(self, recipe_id, ingredient_id):
         ri = RecipeIngredientModel.find_by_recipe_ingredient(
             recipe_id, ingredient_id)
@@ -38,7 +36,6 @@ class RecipeIngredient(Resource):
             return {'message': 'Recipe ingredient deleted.'}
         return {'message': 'Recipe ingredient not found'}, 404
 
-    @fresh_jwt_required
     def put(self, recipe_id, ingredient_id):
         data = RecipeIngredient.parser.parse_args()
 
@@ -56,6 +53,5 @@ class RecipeIngredient(Resource):
 
 class RecipeIngredientList(Resource):
 
-    @fresh_jwt_required
     def get(self, recipe_id):
         return {'ingredients': [x.json() for x in RecipeIngredientModel.find_by_recipe(recipe_id)]}

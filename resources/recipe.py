@@ -40,8 +40,17 @@ class NewRecipe(Resource):
                         required=True,
                         help="It takes no time to make?"
                         )
+    parser.add_argument('chef_name',
+                        type=str,
+                        required=True,
+                        help="Someone came up with this"
+                        )
+    parser.add_argument('chef_id',
+                        type=int,
+                        required=True,
+                        help="We need your id pls"
+                        )
 
-    @fresh_jwt_required
     def post(self):
         data = self.parser.parse_args()
         if RecipeModel.find_by_name(data['name']):
@@ -57,39 +66,41 @@ class NewRecipe(Resource):
 
 
 class Recipe(Resource):
-    @fresh_jwt_required
     def get(self, recipe_id):
         recipe = RecipeModel.find_by_id(recipe_id)
         if recipe:
             return recipe.json()
         return {'message': 'Recipe not found'}, 404
 
-    @fresh_jwt_required
     def delete(self, recipe_id):
-        claims = get_jwt_claims()
-        if not claims['admin']:
-            return {'message': 'Admin privilege required.'}, 401
+        data = NewRecipe.parser.parse_args()
+
 
         recipe = RecipeModel.find_by_id(recipe_id)
         if recipe:
-            recipe.delete_from_db()
-            return {'message': 'Recipe deleted'}
+            if recipe.chef_id == data[chef_id]:
+                recipe.delete_from_db()
+                return {'message': 'Recipe deleted'}
+            else:
+                return {'message': 'You can not delete this recipe as you are not the chef.'}, 401
         return {'message': 'Recipe not found'}, 404
 
-    @fresh_jwt_required
     def put(self, recipe_id):
         data = NewRecipe.parser.parse_args()
 
         recipe = RecipeModel.find_by_id(recipe_id)
 
         if recipe:
-            recipe.name = data['name']
-            recipe.recipe_type = data['recipe_type']
-            recipe.description = data['description']
-            recipe.steps = data['steps']
-            recipe.servings = data['servings']
-            recipe.prep_min = data['prep_min']
-            recipe.cook_min = data['cook_min']
+            if recipe.chef_id == data[chef_id]:
+                recipe.name = data['name']
+                recipe.recipe_type = data['recipe_type']
+                recipe.description = data['description']
+                recipe.steps = data['steps']
+                recipe.servings = data['servings']
+                recipe.prep_min = data['prep_min']
+                recipe.cook_min = data['cook_min']
+            else:
+                return {'message': 'You can not change this recipe as you are not the chef.'}, 401
         else:
             recipe = RecipeModel(**data)
 
@@ -97,7 +108,14 @@ class Recipe(Resource):
         return recipe.json(), 201
 
 
-class RecipeList(Resource):
-    @fresh_jwt_required
+class RecipeListAll(Resource):
     def get(self):
+        return {'recipes': [recipe.json() for recipe in RecipeModel.find_all()]}
+
+class RecipeListType(Resource):
+    def get(self, type):
+        return {'recipes': [recipe.json() for recipe in RecipeModel.find_all()]}
+
+class RecipeListChef(Resource):
+    def get(self, chef_id):
         return {'recipes': [recipe.json() for recipe in RecipeModel.find_all()]}
