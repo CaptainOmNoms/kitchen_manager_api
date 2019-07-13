@@ -35,8 +35,8 @@ api.add_resource(RecipeIngredient,
                  '/recipe_ingredient/<int:recipe_id>/<int:ingredient_id>')
 api.add_resource(RecipeIngredientList, '/recipe_ingredients/<int:recipe_id>')
 
-db.init_app(app)
+
 
 if __name__ == '__main__':
-
+    db.init_app(app)
     app.run(port=5000, debug=True)
