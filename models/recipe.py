@@ -53,10 +53,6 @@ class RecipeModel(db.Model):
         return cls.query.filter_by(recipe_type=type)
 
     @classmethod
-    def find_by_chef_name(cls, chef_name):
-        return cls.query.filter_by(chef_name=chef_name)
-
-    @classmethod
     def find_by_chef_id(cls, chef_id):
         return cls.query.filter_by(chef_id=chef_id)
 

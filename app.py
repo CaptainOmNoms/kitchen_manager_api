@@ -3,16 +3,15 @@ from flask import Flask, jsonify
 from flask_restful import Api
 
 from db import db
-from resources.recipe import NewRecipe, Recipe, RecipeList
+from resources.recipe import NewRecipe, Recipe, RecipeListAll, RecipeListType, RecipeListChef
 from resources.ingredient import NewIngredient, Ingredient, IngredientList
 from resources.recipe_ingredient import RecipeIngredient, RecipeIngredientList
-from resources.user import User, UserRegister, UserLogin, UserLogout, TokenRefresh
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
     'DATABASE_URL', 'sqlite:///data.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['PROPAGATE_EXCEPTIONS'] = True
 api = Api(app)
 
@@ -23,8 +22,8 @@ def create_tables():
 
 api.add_resource(NewRecipe, '/recipe')
 api.add_resource(Recipe, '/recipe/<int:recipe_id>')
-api.add_resource(RecipeList, '/recipes')
-api.add_resource(RecipeListType, '/recipes/<str:type>')
+api.add_resource(RecipeListAll, '/recipes')
+api.add_resource(RecipeListType, '/recipes/<string:type>')
 api.add_resource(RecipeListChef, '/my_recipes/<int:chef_id>')
 
 api.add_resource(NewIngredient, '/ingredient')

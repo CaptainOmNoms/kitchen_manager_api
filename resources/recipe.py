@@ -1,5 +1,4 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import get_jwt_claims, get_jwt_identity,  fresh_jwt_required
 from models.recipe import RecipeModel
 
 
@@ -78,7 +77,7 @@ class Recipe(Resource):
 
         recipe = RecipeModel.find_by_id(recipe_id)
         if recipe:
-            if recipe.chef_id == data[chef_id]:
+            if recipe.chef_id == data['chef_id']:
                 recipe.delete_from_db()
                 return {'message': 'Recipe deleted'}
             else:
@@ -91,7 +90,7 @@ class Recipe(Resource):
         recipe = RecipeModel.find_by_id(recipe_id)
 
         if recipe:
-            if recipe.chef_id == data[chef_id]:
+            if recipe.chef_id == data['chef_id']:
                 recipe.name = data['name']
                 recipe.recipe_type = data['recipe_type']
                 recipe.description = data['description']
@@ -114,8 +113,8 @@ class RecipeListAll(Resource):
 
 class RecipeListType(Resource):
     def get(self, type):
-        return {'recipes': [recipe.json() for recipe in RecipeModel.find_all()]}
+        return {'recipes': [recipe.json() for recipe in RecipeModel.find_by_type(type)]}
 
 class RecipeListChef(Resource):
     def get(self, chef_id):
-        return {'recipes': [recipe.json() for recipe in RecipeModel.find_all()]}
+        return {'recipes': [recipe.json() for recipe in RecipeModel.find_by_chef_id(chef_id)]}

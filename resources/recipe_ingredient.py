@@ -1,5 +1,4 @@
 from flask_restful import Resource, reqparse
-from flask_jwt_extended import get_jwt_claims, get_jwt_identity,  fresh_jwt_required
 from models.ingredient import IngredientModel
 from models.recipe import RecipeModel
 from models.recipe_ingredient import RecipeIngredientModel
